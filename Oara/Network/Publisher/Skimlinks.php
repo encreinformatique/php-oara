@@ -187,7 +187,7 @@ class Skimlinks extends \Oara\Network
     private function processTransactions($valuesFromExport)
     {
         $totalTransactions = array();
-        $limit = 100; //default 30
+        $limit = 600; //default 30 max. 600
         $offset = 0;
 
         while (true) {
@@ -225,12 +225,17 @@ class Skimlinks extends \Oara\Network
                             $transaction['currency'] = $i["transaction_details"]["basket"]["currency"];
                         }
                         $transactionStatus = $i["transaction_details"]["status"];
-                        if ($transactionStatus == "active") {
+                        $payment_status = $i["transaction_details"]["payment_status"];
+                        if ($transactionStatus == "active" && $payment_status == 'paid') {
                             $transaction ['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                        } else if ($transactionStatus == "cancelled") {
+                        }
+                        else if ($transactionStatus == "active" && $payment_status == 'unpaid') {
+                            $transaction ['status'] = \Oara\Utilities::STATUS_PENDING;
+                        }
+                        else if ($transactionStatus == "cancelled") {
                             $transaction ['status'] = \Oara\Utilities::STATUS_DECLINED;
                         } else {
-                            throw new \Exception ("New status found {$transactionStatus}");
+                            throw new \Exception ("[Skimlinks][processTransactions] transaction status -- new status found {$transactionStatus}");
                         }
                     }
                     if (isset($i["click_details"])) {
@@ -253,7 +258,7 @@ class Skimlinks extends \Oara\Network
                     break;
                 }
                 $offset += $limit;
-                $limit = 100;
+                $limit = 600;
             }
             catch(\Exception $e){
                 if ($limit == 1){
@@ -282,7 +287,7 @@ class Skimlinks extends \Oara\Network
     public function getMerchantsSkimlinks($a_params):array {
 
         $a_merchants = Array();
-        $limit = 100; //default 25
+        $limit = 200; //default 25
         $offset = 0;
 
         array_push($a_params,
@@ -317,7 +322,7 @@ class Skimlinks extends \Oara\Network
                     break;
                 }
                 $offset += $limit;
-                $limit = 100;
+                $limit = 200;
             }
             catch(\Exception $e){
                 if ($limit == 1){
