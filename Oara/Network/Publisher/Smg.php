@@ -20,6 +20,8 @@ namespace Oara\Network\Publisher;
      * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
      **/
 
+use Symfony\Component\DomCrawler\Crawler;
+
 /**
  * Export Class
  *
@@ -63,8 +65,8 @@ class Smg extends \Oara\Network
         $urls = array();
         $urls[] = new \Oara\Curl\Request('https://app.impact.com/secure/mediapartner/accountSettings/mp-wsapi-flow.ihtml?', array());
         $exportReport = $this->_client->get($urls);
-        $dom = new \Laminas\Dom\Query($exportReport[0]);
-        $results = $dom->execute('div .uitkFields');
+        $dom = new Crawler($exportReport[0]);
+        $results = $dom->filter('div .uitkFields');
         $count = \count($results);
         if ($count == 0) {
 
@@ -76,8 +78,8 @@ class Smg extends \Oara\Network
             $urls = array();
             $urls[] = new \Oara\Curl\Request('https://app.impact.com/secure/mediapartner/accountSettings/mp-wsapi-flow.ihtml?', array());
             $exportReport = $this->_client->get($urls);
-            $dom = new \Laminas\Dom\Query($exportReport[0]);
-            $results = $dom->execute('div .uitkFields');
+            $dom = new Crawler($exportReport[0]);
+            $results = $dom->filter('div .uitkFields');
             $count = \count($results); // get number of matches: 4
             if ($count == 0) {
                 throw new \Exception ("No API credentials");

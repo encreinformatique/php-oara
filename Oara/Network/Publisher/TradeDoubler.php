@@ -21,6 +21,8 @@ namespace Oara\Network\Publisher;
  * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
  **/
 
+ use Symfony\Component\DomCrawler\Crawler;
+
 /**
  * Export Class
  *
@@ -462,13 +464,12 @@ class TradeDoubler extends \Oara\Network
 		$urls[] = new \Oara\Curl\Request('http://publisher.tradedoubler.com/pan/reports/Payment.html?', $valuesFormExport);
 		$exportReport = $this->_client->get($urls);
 
-
-		$dom = new \Laminas\Dom\Query($exportReport[0]);
-		$results = $dom->execute('//a');
+        $crawler = new Crawler($htmlReport);
+		$links = $crawler->filter('//a');
 
 		$urls = array();
-		foreach ($results as $result) {
-			$url = $result->getAttribute('href');
+		foreach ($links as $link) {
+			$url = $link->getAttribute('href');
 			$urls[] = new \Oara\Curl\Request("http://publisher.tradedoubler.com" . $url . "&format=CSV", array());
 		}
 		$exportReportList = $this->_client->get($urls);
