@@ -20,6 +20,8 @@ namespace Oara\Network\Publisher;
      * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
      **/
 
+     use Symfony\Component\DomCrawler\Crawler;
+
 /**
  * Export Class
  *
@@ -169,8 +171,8 @@ class AutoEurope extends \Oara\Network
     public function readTransactions($htmlReport)
     {
         $pdfContent = '';
-        $dom = new \Laminas\Dom\Query($htmlReport);
-        $links = $dom->execute('.text a');
+        $crawler = new Crawler($htmlReport);
+        $links = $crawler->filter('.text a');
         $pdfUrl = null;
         foreach ($links as $link) {
             $pdfUrl = $link->getAttribute('href');
